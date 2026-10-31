@@ -19,9 +19,10 @@ staticfiles/
 # Logs
 *.log
 local_settings.py
-.env
 .env.*
 !.env.example
+!backend/.env
+!.env
 
 # ==========================================
 # Node.js & Frontend (Vite + React)

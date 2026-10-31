@@ -1,0 +1,50 @@
+services:
+  # Backend Web Service
+  - type: web
+    name: jobcrest-backend
+    env: python
+    rootDir: backend
+    buildCommand: ./build.sh
+    startCommand: gunicorn config.wsgi:application --bind 0.0.0.0:$PORT --workers 2
+    plan: free
+    autoDeploy: true
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.8
+      - key: SECRET_KEY
+        value: django-insecure-ln2hy8x1+&+^!*tpx+kbr@sr@e$)#_-h8n-tu!7q1&7*!lw4so
+      - key: DEBUG
+        value: "True"
+      - key: ALLOWED_HOSTS
+        value: localhost,127.0.0.1,.onrender.com,.up.railway.app,*
+      - key: DB_ENGINE
+        value: django.db.backends.postgresql
+      - key: DB_NAME
+        value: postgres
+      - key: DB_USER
+        value: postgres
+      - key: DB_PASSWORD
+        value: Abhi_ram0007
+      - key: DB_HOST
+        value: db.wkxzmtmiccvfuncanskb.supabase.co
+      - key: DB_PORT
+        value: "5432"
+      - key: DB_SSLMODE
+        value: require
+      - key: CORS_ALLOW_ALL_ORIGINS
+        value: "True"
+      - key: CORS_ALLOW_CREDENTIALS
+        value: "True"
+
+  # Frontend Static Site
+  - type: web
+    name: jobcrest-frontend
+    env: static
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    pullRequestPreviewsEnabled: false
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html

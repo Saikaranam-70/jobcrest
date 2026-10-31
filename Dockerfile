@@ -23,9 +23,8 @@ COPY backend/ .
 # Collect static files
 RUN python manage.py collectstatic --no-input
 
-# Expose port
+# Expose default port
 EXPOSE 8000
 
-# Start gunicorn
-CMD ["gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "2"]
-
+# Start gunicorn dynamically on $PORT (set by Render/Railway) with automatic migration
+CMD ["sh", "-c", "python manage.py migrate --noinput && gunicorn config.wsgi:application --bind 0.0.0.0:${PORT:-8000} --workers 2"]

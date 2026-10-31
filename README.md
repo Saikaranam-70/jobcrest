@@ -421,29 +421,66 @@ docker run -p 8000:8000 \
 
 ---
 
-## 🌍 Deployment Guides
+## 🚀 Deployment Guides (Render & Railway)
 
-<details>
-<summary><b>Koyeb (Free, No Credit Card)</b></summary>
+### 1. Render Deployment (`render.yaml` Blueprint or Manual)
 
-1. Push code to GitHub
-2. Go to [koyeb.com](https://koyeb.com) → Create App → GitHub source
-3. Select repo `Abhiramaduri/jobcrest`, branch `main`
-4. Port: `8000`, Dockerfile: auto-detected
-5. Add all environment variables
-6. Deploy ✅
+This repository includes a `render.yaml` blueprint for 1-click deployment on [Render](https://render.com).
 
-</details>
+#### Option A: One-Click Blueprint
+1. Push your repository to GitHub.
+2. Log into [Render Dashboard](https://dashboard.render.com).
+3. Click **New +** → **Blueprint**.
+4. Select your `jobcrest` repository. Render will automatically detect `render.yaml` and configure both the backend service and frontend static site!
+5. Click **Apply**.
 
-<details>
-<summary><b>Render (Free Tier)</b></summary>
+#### Option B: Manual Web Service (Backend)
+1. In Render, select **New +** → **Web Service** → Connect your GitHub repo.
+2. Set configuration:
+   - **Name:** `jobcrest-backend`
+   - **Root Directory:** `backend`
+   - **Environment:** `Python`
+   - **Build Command:** `./build.sh`
+   - **Start Command:** `gunicorn config.wsgi:application --bind 0.0.0.0:$PORT --workers 2`
+3. Add the Environment Variables (from your `.env`).
+4. Click **Create Web Service**.
 
-- **Root Directory:** `backend`
-- **Build Command:** `pip install -r requirements.txt && python manage.py collectstatic --no-input && python manage.py migrate`
-- **Start Command:** `gunicorn config.wsgi:application`
-- Add environment variables in the Render dashboard
+#### Option C: Frontend Static Site (Render)
+1. Click **New +** → **Static Site**.
+2. Set configuration:
+   - **Root Directory:** `frontend`
+   - **Build Command:** `npm install && npm run build`
+   - **Publish Directory:** `dist`
+3. In **Redirects/Rewrites**:
+   - Rule: `/*` -> `/index.html` (Rewrite)
+4. Environment Variables:
+   - `VITE_API_BASE_URL`: `https://<your-backend-service>.onrender.com/api`
 
-</details>
+---
+
+### 2. Railway Deployment (`railway.json` / Procfile / Docker)
+
+This repository is pre-configured with `railway.json`, `Dockerfile`, and `Procfile` for [Railway](https://railway.app).
+
+#### Deploying Backend on Railway:
+1. Go to [Railway Dashboard](https://railway.app/dashboard).
+2. Click **New Project** → **Deploy from GitHub repo** → select `jobcrest`.
+3. In **Settings** → **Build**:
+   - Builder: Auto-detected (Nixpacks / Dockerfile)
+   - Or set **Root Directory:** `backend` (or leave default root with root `Procfile`)
+4. In **Variables**, your environment variables will either be read from `.env` or you can add them:
+   - `SECRET_KEY`, `DEBUG`, `ALLOWED_HOSTS`, `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`, `DB_PORT`, `DB_SSLMODE`
+5. Railway assigns a public URL under **Settings** → **Networking** → **Generate Domain**.
+
+#### Deploying Frontend on Railway:
+1. In the same project, click **New Service** → **GitHub Repo** → select `jobcrest`.
+2. Under **Settings**:
+   - **Root Directory:** `frontend`
+   - **Build Command:** `npm install && npm run build`
+   - **Start Command:** `npm run preview`
+3. Set **Variables**:
+   - `VITE_API_BASE_URL`: `https://<your-backend-railway-domain>/api`
+4. Generate a public domain under **Networking**.
 
 ---
 
